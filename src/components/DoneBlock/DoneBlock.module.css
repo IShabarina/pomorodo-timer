@@ -1,0 +1,9 @@
+.doneSection {
+    margin: 10px auto;
+    color: aliceblue;
+}
+
+.doneList {
+    display: flex;
+    flex-direction: column;
+}

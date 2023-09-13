@@ -1,0 +1,45 @@
+.formContainer {
+    padding: 5px 5px 15px;
+    border: solid 1px var(--back-light-grey);
+    border-radius: 10px;
+    background-color: var(--back-light-grey);
+    margin-bottom: 10px;
+}
+
+.title {
+    margin: 0 0 5px;
+    color: var(--border-grey);
+    font-size: 16px;
+    font-weight: 100;
+}
+
+.addTodoForm {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    /* padding: 5px 5px 15px; */
+}
+
+.selectConteiner {
+    display: flex;
+    justify-content: center;
+    position: relative;
+    min-width: 35px;
+    height: 35px;
+}
+
+
+.input {
+    min-width: 75%;
+    border-radius: 10px;
+}
+
+.select {
+    border: none;
+    appearance: none;
+    padding: 0 15px;
+    color: var(--border-grey);
+    background-color: var(--back-light-grey);
+    font-size: 20px;
+}

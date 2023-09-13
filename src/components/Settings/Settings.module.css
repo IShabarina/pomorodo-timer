@@ -1,0 +1,29 @@
+.settingsSection {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin: 10px auto;
+    padding: 10px 15px;
+    border: solid 1px var(--back-light-greyback-light-grey);
+    border-radius: 10px;
+    text-align: center;
+    background-color: var(--back-light-grey);
+    color: var(--border-grey);
+    min-height: 252px;
+  }
+
+.title {
+  margin: 0 0 10px;
+  color: var(--title-grey);
+}
+  
+.settingsLabel {
+    display: block;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    text-align: left;
+    font-size: 15px;
+}
+
+
+

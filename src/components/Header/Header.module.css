@@ -1,0 +1,12 @@
+.header {
+    color: var(--yellow);
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.mainTitle {
+    padding: 0;
+    margin: 0;
+    text-align: center;
+}

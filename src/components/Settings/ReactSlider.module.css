@@ -1,0 +1,30 @@
+.slider {
+  height: 30px;
+  border: 2px solid var(--tomato);
+  border-radius: 30px;
+  margin-bottom: 10px;
+}
+
+.thumb {
+  background-color: var(--tomato);
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  border-radius: 20px;
+}
+
+.slider.green {
+  border: 2px solid var(--green);
+}
+
+.slider.yellow {
+  border: 2px solid var(--yellow);
+}
+
+.slider.green .thumb {
+  background-color: var(--green);
+}
+
+.slider.yellow .thumb {
+  background-color: var(--yellow);
+}

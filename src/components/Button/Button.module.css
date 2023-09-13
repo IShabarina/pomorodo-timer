@@ -1,0 +1,28 @@
+button {
+    display: inline-block;
+    width: 50px;
+    background-color: transparent;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+  }
+  
+.withText {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    width: auto;
+    border: 1px solid var(--border-grey);
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-size: 25px;
+  }
+  
+.withText div {
+  margin-right: 5px;
+}
+
+button:disabled {
+  color: #787889;
+}

@@ -1,0 +1,22 @@
+.timerSection {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin: 10px auto;
+    padding: 10px 15px;
+    border: solid 1px var(--back-light-greyback-light-grey);
+    border-radius: 10px;
+    text-align: center;
+    background-color: var(--back-light-grey);
+    min-height: 252px;
+}
+
+.timerBar {
+    width: 200px;
+    height: 200px;
+}
+
+.buttonsBar {
+    display: flex;
+    flex-direction: column;
+}

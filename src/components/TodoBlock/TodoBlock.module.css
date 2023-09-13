@@ -1,0 +1,23 @@
+.todoSection {
+    margin: 10px auto;
+    color: aliceblue;
+}
+
+.todoListContainer {
+    padding: 5px 5px 15px;
+    border: solid 1px var(--back-light-grey);
+    border-radius: 10px;
+    background-color: var(--back-light-grey);
+}
+
+.title {
+    margin: 0 0 5px;
+    color: var(--border-grey);
+    font-size: 16px;
+    font-weight: 100;
+}
+
+.todoList {
+    display: flex;
+    flex-direction: column;
+}

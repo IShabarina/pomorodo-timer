@@ -1,0 +1,16 @@
+.todoItem {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    cursor: pointer;
+    border-radius: 10px;
+}
+
+.active {
+    background-color: var(--title-grey);
+}
+
+.title {
+    min-width: 70%;
+}
