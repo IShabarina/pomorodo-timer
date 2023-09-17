@@ -1,53 +1,30 @@
-import React  from "react";
+import React, { useTransition } from "react";
 import './main.global.css';
-import { Layout } from "./components/Layout/Layout";
-import { Settings } from "./components/Settings/Settings";
-import Timer from "./components/Timer/Timer";
-import { useStore } from "effector-react";
+import Layout from "./components/Layout/Layout";
+import Header from "./components/Header/Header";
+import HomePage from "./components/HomePage/HomePage";
+import StatisticPage from "./components/StatisticPage/StatisticPage";
+import Content from "./components/Content/Content";
 
-import { $settingsVisible, $todoList } from "./store";
-import { TodoBlock } from "./components/TodoBlock/TodoBlock";
-import { DoneBlock } from "./components/DoneBlock/DoneBlock";
-import AppDescription from "./components/AppDescription/AppDescription";
-
-// // Effector:
-// const updateSettings = createEvent(); //event
-// export const $settings = createStore({ workMin:  25, breakMin: 5 }) //store
-//   .on(updateSettings, (_, newSettings) => newSettings); //action & reducer
-// $settings.watch((state) => { //watcher:
-//   console.log('state', state);
-// })
+import { Routes, Route, Navigate } from 'react-router-dom';
 
 function App() {
-  // const todoList = useStore($todoList);
-  const settingsVisible = useStore($settingsVisible);
-
-  // const [isTimerStarted, setIsTimerStarted] = useState(null);
-  // const [isSessionFinished, setIsSessionFinished] = useState(false);
-
-  // const startTodo = () => {
-  //   if (todoList.length > 0) {
-  //     setIsTimerStarted(true);
-  //     // setTaskSessionCount(0);
-  //     console.log('timer is working!');
-  //   }
-  // }
-
-  // const changeTodo = () => {
-  //   setIsSessionFinished(true);
-  //   console.log('задача  завершена!');
-  // }
 
   return (
+    // <BrowserRouter>
     <Layout>
-      {settingsVisible
-        ? <Settings />
-        // : <Timer onStart={startTodo} onWorkSessionFinish={changeTodo} />}
-        : <Timer />}
-      <TodoBlock />
-      <DoneBlock />
-      <AppDescription />
+      <Header />
+      <Content>
+        <Routes >
+          <Route path="/" element={<HomePage />} />
+          {/* <Route path="/" element={<Navigate to="/timer" />} /> */}
+          <Route path="/timer" element={<HomePage />} />
+          <Route path="/statistic" element={<StatisticPage />} />
+          {/* <Route path="*" element={<NotFoundPage />} /> */}
+        </Routes>
+      </Content>
     </Layout>
+    // </BrowserRouter>
   );
 }
 

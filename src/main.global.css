@@ -16,4 +16,11 @@ body {
   font-family: 'Roboto', serif;
 }
 
+* {
+  box-sizing: border-box;
+}
+
+a {
+  text-decoration: none;
+}
 

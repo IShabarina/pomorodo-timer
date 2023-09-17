@@ -14,7 +14,7 @@ $settings
     .on(updateSettings, (_, newSettings) => newSettings); //action & reducer
 
 
-export const Settings = () => {
+const Settings = () => {
     const settings = useStore($settings);
 
     const updateWorkMin = (newWorkMin) => {
@@ -70,3 +70,5 @@ export const Settings = () => {
         </div>
     )
 }
+
+export default Settings;

@@ -7,8 +7,8 @@
 }
 
 .title {
-    margin: 0 0 5px;
-    color: var(--border-grey);
+    margin: 0 0 10px;
+    color: var(--title-grey);
     font-size: 16px;
     font-weight: 100;
 }
@@ -18,7 +18,8 @@
     flex-direction: row;
     justify-content: space-between;
     flex-wrap: nowrap;
-    /* padding: 5px 5px 15px; */
+    border: 3px solid var(--title-grey);
+    border-radius: 10px;
 }
 
 .selectConteiner {
@@ -27,19 +28,41 @@
     position: relative;
     min-width: 35px;
     height: 35px;
+    margin: 1px;
+    border: 1px solid var(--title-grey);
+    border-radius: 5px;
 }
 
 
 .input {
     min-width: 75%;
     border-radius: 10px;
+    border: none;
+    outline: none;
+    padding: 0 10px;
+    color: aliceblue;
+    font-size: 20px;
+    background-color: transparent;
 }
 
 .select {
     border: none;
     appearance: none;
-    padding: 0 15px;
+    padding: 0 10px;
     color: var(--border-grey);
     background-color: var(--back-light-grey);
     font-size: 20px;
+    cursor: pointer;
+    
+}
+
+.select:focus-visible {
+    border: none;
+    outline: none;
+}
+
+.addTodoForm button {
+    width: 47px;
+    background-color: var(--green);
+    border-radius: 8px;
 }

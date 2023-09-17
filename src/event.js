@@ -5,13 +5,15 @@ export const updateSettingsVisible = createEvent();
 
 export const addTodo = createEvent();
 export const startFirstTodo = createEvent();
+export const toggleFinishTodo = createEvent();
+export const editTodo = createEvent();
 export const deleteTodo = createEvent();
 export const finishTodo = createEvent();
 
 export const addDoneTask = createEvent();
 
-export const changeTaskText = createEvent();
-export const changeTaskTime = createEvent();
+// export const changeTaskText = createEvent();
+// export const changeTaskTime = createEvent();
 
 export const changeWorkSessionsCount = createEvent();
 export const increaseTimerWorkSessionCount = createEvent();

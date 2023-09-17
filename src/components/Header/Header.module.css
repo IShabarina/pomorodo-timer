@@ -1,8 +1,13 @@
 .header {
-    color: var(--yellow);
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    color: var(--title-grey);
+    padding-right: 15px;
+}
+
+.header a {
+    color: var(--title-grey);
 }
 
 .mainTitle {
@@ -10,3 +15,9 @@
     margin: 0;
     text-align: center;
 }
+
+.header a:hover {
+    color: var(--border-grey);
+    transition: ease-in-out;
+}
+

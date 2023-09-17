@@ -3,11 +3,8 @@ import styles from './Timer.module.css';
 import { useStore } from 'effector-react';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
-
-
 import { Button } from '../Button/Button';
-
-import { $settingsVisible, $settings, $timerActivity } from '../../store';
+import { $settingsVisible, $settings, $timerActivity, $todoList } from '../../store';
 import { updateSettingsVisible, increaseTimerWorkSessionCount, startTimer } from '../../event';
 
 $settingsVisible
@@ -26,18 +23,22 @@ $timerActivity
 const tomatoColor = '#f54e54';
 const greenColor = '#318954';
 
+
 const Timer = () => {
     const settingsModeOn = useStore($settingsVisible);
     const settings = useStore($settings);
     const timerActivityData = useStore($timerActivity);
+    const todoList = useStore($todoList);
 
     const [isPaused, setIsPaused] = useState(true); // to show play btn initially
     const [timerMode, setTimerMode] = useState('work'); //work/break/longBreak
     const [secondsLeft, setsecondsLeft] = useState(0); // 0 sec till end
+    const [todoListIsEmpty, setTodoListIsEmpty] = useState(todoList.length === 0 ? true : false);
 
     const isPausedRef = useRef(isPaused);
     const timerModeRef = useRef(timerMode);
     const secondsLeftRef = useRef(secondsLeft);
+
 
     const setSettingsMode = (mode) => {
         updateSettingsVisible(mode);
@@ -47,22 +48,18 @@ const Timer = () => {
         let workSessionsCount = timerActivityData.workSessionsCount;
         console.log('workSessionsCount', workSessionsCount);
         const nextMode = timerModeRef.current === 'work'
-            // ? (timerActivityData.workSessionsCount + 1) % 4 === 0 ? 'longBreak' : 'break'
             ? workSessionsCount % 4 === 0 ? 'longBreak' : 'break'
             : 'work';
         let nextSeconds;
-        console.log('nextMode:', nextMode);
         switch (nextMode) {
             case 'work':
                 increaseTimerWorkSessionCount();
                 nextSeconds = settings.workMin * 60;
                 break;
             case 'break':
-                // increaseTimerWorkSessionCount();
                 nextSeconds = settings.breakMin * 60;
                 break;
             case 'longBreak':
-                // increaseTimerWorkSessionCount();
                 nextSeconds = settings.longBreakMin * 60;
                 break;
             default:
@@ -75,6 +72,7 @@ const Timer = () => {
     }
 
     function onPlayButtonClick() {
+        if (todoListIsEmpty) return;
         setIsPaused(false);
         isPausedRef.current = false;
         startTimer(true);
@@ -94,25 +92,31 @@ const Timer = () => {
     function initTimer() {
         setsecondsLeft(settings.workMin * 60);
         secondsLeftRef.current = settings.workMin * 60;
-        console.log('initTimer - secondsLeftRef', secondsLeftRef.current);
-        console.log('initTimer - secondsLeft', secondsLeft);
     }
 
     useEffect(() => {
+        const countNotComplpetedTasks = todoList.filter((todo) => todo.isCompleted === false).length;
+         setTodoListIsEmpty(countNotComplpetedTasks > 0 ? false : true);
+    }, [todoList]);
+
+    useEffect(() => {
         initTimer();
+        if (todoListIsEmpty) return;
         const interval = setInterval(() => {
-            if (isPausedRef.current) {
-                console.log('isPausedRef.current:', isPausedRef.current);
-                return;
+            if (!todoListIsEmpty) {
+                if (isPausedRef.current) {
+                    console.log('isPausedRef.current:', isPausedRef.current);
+                    return;
+                }
+                if (secondsLeftRef.current === 0) {
+                    console.log('secondsLeftRef.current:', secondsLeftRef.current);
+                    return switchMode();
+                }
+                tick();
             }
-            if (secondsLeftRef.current === 0) {
-                console.log('secondsLeftRef.current:', secondsLeftRef.current);
-                return switchMode();
-            }
-            tick();
         }, 10);
         return () => clearInterval(interval);
-    }, [settings]);
+    }, [settings, todoListIsEmpty]);
 
     // time data for Timer visual:
     const timeRemaining = {

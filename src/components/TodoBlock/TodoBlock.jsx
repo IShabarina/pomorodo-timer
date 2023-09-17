@@ -2,15 +2,11 @@ import { generateRandomString } from '../../utils/generateRandomIndex';
 import TodoItem from '../TodoItem/TodoItem';
 import styles from './TodoBlock.module.css';
 
-import { $todoList, $doneList, $task, $timerActivity } from '../../store';
-import { addTodo, startFirstTodo, deleteTodo, finishTodo, addDoneTask } from '../../event';
+import { $todoList, $doneList, $timerActivity } from '../../store';
+import { addTodo, startFirstTodo, toggleFinishTodo, deleteTodo, finishTodo, addDoneTask, editTodo } from '../../event';
 import { useStore } from 'effector-react';
 import { useEffect } from 'react';
 import NewTaskForm from '../NewTaskForm/NewTaskForm';
-
-addTodo.watch((e) => {
-    e.preventDefault()
-})
 
 $todoList
     .on(addTodo, (todoList, task) => [
@@ -24,18 +20,51 @@ $todoList
             id: generateRandomString(),
         },
     ])
-    .on(startFirstTodo, (todoList, status) =>
-        todoList.map((todo, i) => {
-            if (i === 0) {
+    .on(startFirstTodo, (todoList) => {
+        let firstNotStartedTodoIndex = -1;
+        const updatedTodos = todoList.map((todo, index) => {
+            if (!todo.isCompleted && firstNotStartedTodoIndex === -1) {
+                firstNotStartedTodoIndex = index;
                 return {
                     ...todo,
-                    isStarted: status,
+                    isStarted: true,
+                };
+            } else {
+                return {
+                    ...todo,
+                    isStarted: false,
+                };
+            }
+        });
+        return updatedTodos;
+    })
+    .on(deleteTodo, (todoList, id) =>
+        todoList.filter(todo => todo.id !== id)
+    )
+    .on(toggleFinishTodo, (todoList, id) =>
+        todoList.map((todo) => {
+            if (todo.id === id) {
+                return {
+                    ...todo,
+                    isStarted: false,
+                    isCompleted: !todo.isCompleted,
                 };
             }
             return todo;
         }))
-    .on(deleteTodo, (todoList, id) =>
-        todoList.filter(todo => todo.id !== id)
+    .on(editTodo, (todoList, editedTask) =>
+        todoList.map((todo) => {
+            console.log('editedTask passed', editedTask);
+            if (todo.id === editedTask.id) {
+                console.log('edit todo:', todo);
+                return {
+                    ...todo,
+                    title: editedTask['text'] !== undefined ? editedTask.text : todo.title,
+                    time: editedTask['time'] !== undefined ? editedTask.time : todo.time,
+                };
+            }
+            return todo;
+        })
     )
     .on(finishTodo, (todoList) =>
         todoList.map((todo) => {
@@ -44,20 +73,20 @@ $todoList
                 newTimeLeft = Math.max(0, todo.timeLeft - 1);
                 if (newTimeLeft === 0) {
                     addDoneTask(todo);
-                    // return {
-                    //     ...todo,
-                    //     isStarted: false,
-                    //     isCompleted: true,
-                    //     timeLeft: newTimeLeft,
-                    // };
-                    return null;
+                    return {
+                        ...todo,
+                        isStarted: false,
+                        isCompleted: true,
+                        timeLeft: newTimeLeft,
+                    };
                 }
             }
             return {
                 ...todo,
                 timeLeft: newTimeLeft,
             };
-        }).filter((todo) => todo !== null))
+            // }).filter((todo) => todo !== null))
+        }))
 
 $doneList
     .on(addDoneTask, (doneList, doneTask) => [
@@ -65,31 +94,28 @@ $doneList
         doneTask
     ])
 
-export const TodoBlock = () => {
-    const task = useStore($task);
+
+const TodoBlock = () => {
     const todoList = useStore($todoList);
     const timerActivity = useStore($timerActivity);
 
-
-    const qtyOfTask = todoList.length;
+    const totalTasks = todoList.length;
 
     useEffect(() => {
         if (timerActivity.isStarted) {
-            startFirstTodo(true);
+            startFirstTodo();
         }
     }, [timerActivity.isStarted]);
 
     useEffect(() => {
         finishTodo();
-        startFirstTodo(true);
+        startFirstTodo();
     }, [timerActivity.workSessionsCount]);
 
-    const onSubmit = (e) => {
-        e.preventDefault();
-        if (task.text.length > 0) {
-            addTodo(task);
-            startFirstTodo(false);
-        }
+
+    const onAdd = (task) => {
+        addTodo(task);
+        // startFirstTodo(false);
     }
 
     const onDelete = (id) => {
@@ -97,18 +123,34 @@ export const TodoBlock = () => {
         deleteTodo(id);
     }
 
+    const onFinish = (id) => {
+        console.log('Finish item', id);
+        toggleFinishTodo(id);
+    }
+
+    const onEdit = (reTask) => {
+        console.log('reTask in TodoBlock', reTask)
+        editTodo(reTask);
+    }
+
     return (
         <div className={styles.todoSection}>
-            <NewTaskForm onSubmit={onSubmit} />
-
+            <NewTaskForm onAdd={onAdd} />
             <div className={styles.todoListContainer}>
-                <h4 className={styles.title}>Your tasks ({qtyOfTask})</h4>
+                <h4 className={styles.title}>YOUR TASKS ({totalTasks})</h4>
                 <div className={styles.todoList}>
                     {todoList.map(todoItem => (
-                        <TodoItem key={todoItem.id} todo={todoItem} onDelete={onDelete}/>
+                        <TodoItem
+                            key={todoItem.id}
+                            todo={todoItem}
+                            onDelete={onDelete}
+                            onFinish={onFinish}
+                            onEdit={onEdit} />
                     ))}
                 </div>
             </div>
         </div>
     )
 }
+
+export default TodoBlock;

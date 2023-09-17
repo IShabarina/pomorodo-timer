@@ -3,14 +3,27 @@
     align-items: center;
     flex-wrap: nowrap;
     justify-content: space-between;
-    cursor: pointer;
+    margin-bottom: 5px;
+    padding: 5px;
     border-radius: 10px;
+    background-color: var(--title-grey);
+    transition: opacity .3s linear;
 }
 
 .active {
-    background-color: var(--title-grey);
+    background-color: var(--green);
 }
 
-.title {
-    min-width: 70%;
+.completed {
+    opacity: 0.3;
+}
+
+.completed .todoTitle {
+    text-decoration: line-through;
+}
+
+.todoTitle {
+    flex-grow: 1;
+    overflow: hidden;
+    margin: 0 15px 0 10px;
 }

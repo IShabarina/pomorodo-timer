@@ -3,6 +3,14 @@
     color: aliceblue;
 }
 
+.doneListContainer {
+    padding: 5px 5px 15px;
+    border: solid 1px var(--back-light-grey);
+    border-radius: 10px;
+    background-color: var(--back-light-grey);
+}
+
+
 .doneList {
     display: flex;
     flex-direction: column;

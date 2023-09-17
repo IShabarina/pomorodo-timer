@@ -1,13 +1,11 @@
-.todoSection {
-    margin: 10px auto;
-    color: aliceblue;
-}
 
-.todoListContainer {
+.descriptionContainer {
     padding: 5px 5px 15px;
     border: solid 1px var(--back-light-grey);
     border-radius: 10px;
     background-color: var(--back-light-grey);
+    margin-bottom: 10px;
+    color: var(--border-grey);
 }
 
 .title {
@@ -17,7 +15,10 @@
     font-weight: 100;
 }
 
-.todoList {
-    display: flex;
-    flex-direction: column;
+.accordion {
+    list-style: none;
+    margin: 0; 
+    padding: 0;
+    background-color: var(--back-light-grey);
+    border-radius: 10px;
 }
