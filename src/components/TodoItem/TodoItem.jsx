@@ -4,19 +4,14 @@ import Checkbox from '../Checkbox/Checkbox';
 import styles from './TodoItem.module.css';
 
 
-const TodoItem = ({ key, todo, onEdit, onFinish, onDelete }) => {
+const TodoItem = ({ todo, onEdit, onFinish, onDelete }) => {
     const [editMode, setEditMode] = useState(false);
-
-    // const handleEdit = (status) => {
-    //     setEditMode(status);
-    // }
 
     const onChangeTask = (e) => {
         const reTask = {
             [e.target.name]: e.target.value,
             id: todo.id
         }
-        console.log('reTask', reTask);
         onEdit(reTask);
     }
 
@@ -26,7 +21,8 @@ const TodoItem = ({ key, todo, onEdit, onFinish, onDelete }) => {
     }
 
     return (
-        <div key={key}
+        <div
+            // key={todo.id}
             className={todo.isStarted ?
                 `${styles.todoItem} ${styles.active}`
                 : todo.isCompleted ?
@@ -41,9 +37,9 @@ const TodoItem = ({ key, todo, onEdit, onFinish, onDelete }) => {
             )}
             {editMode && (
                 <form onSubmit={onSubmitEditForm}>
-                    <input type='text' name='text' value={todo.title} onChange={onChangeTask} />
-                    <input type='number' name='time' value={todo.time} onChange={onChangeTask} />
-                    <button type='submit' style={{display: 'none'}}></button>
+                    <input type='text' name='text' value={todo.title} onChange={onChangeTask} required />
+                    <input type='number' name='time' value={todo.time} onChange={onChangeTask} min={1} max={4} />
+                    <button type='submit' style={{ display: 'none' }}></button>
                 </form>
             )}
             <Button iconcomponent={'edit'} iconsize={30} onClick={() => setEditMode(true)} />

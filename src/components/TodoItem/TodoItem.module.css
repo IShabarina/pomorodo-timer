@@ -25,5 +25,33 @@
 .todoTitle {
     flex-grow: 1;
     overflow: hidden;
-    margin: 0 15px 0 10px;
+    margin: 0 10px;
+}
+
+.todoItem form {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+}
+
+.todoItem form span {
+    margin: 0 10px;
+}
+
+.todoItem input {
+    padding: 13px 10px;
+    margin: 0 10px;
+    height: 19px;
+    background-color: inherit;
+    border: 2px solid var(--back-light-grey);
+    border-radius: 6px;
+    color: aliceblue;
+}
+
+.todoItem input[type = 'text'] {
+    /* width: 90%; */
+    flex-grow: 1;
+    margin-right: 10px;
 }

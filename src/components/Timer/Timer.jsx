@@ -1,164 +1,195 @@
 import React, { useEffect, useState, useRef } from 'react';
 import styles from './Timer.module.css';
-import { useStore } from 'effector-react';
+import { useStore, useStoreMap } from 'effector-react';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import { Button } from '../Button/Button';
-import { $settingsVisible, $settings, $timerActivity, $todoList } from '../../store';
-import { updateSettingsVisible, increaseTimerWorkSessionCount, startTimer } from '../../event';
-
-$settingsVisible
-    .on(updateSettingsVisible, (_, newSettingsMode) => newSettingsMode); //action & reducer
-
-$timerActivity
-    .on(increaseTimerWorkSessionCount, (state) => ({
-        ...state,
-        workSessionsCount: state.workSessionsCount + 1
-    }))
-    .on(startTimer, (state, status) => ({
-        ...state,
-        isStarted: status
-    }));
+import { $settings, $todoList, $timer, changeTimerVisibility, startTimer, increaseTimerWorkSessionCount, increaseTimerPauseTime, increaseTimerWorkTime } from '../../store';
 
 const tomatoColor = '#f54e54';
 const greenColor = '#318954';
 
 
 const Timer = () => {
-    const settingsModeOn = useStore($settingsVisible);
+    
     const settings = useStore($settings);
-    const timerActivityData = useStore($timerActivity);
-    const todoList = useStore($todoList);
+    const countNotCompletedTasks = useStoreMap({
+        store: $todoList,
+        keys: [],
+        fn: (state) => (state.length === 0) ? 0 : state.filter((todo) => todo.isCompleted === false).length,
+    })
 
-    const [isPaused, setIsPaused] = useState(true); // to show play btn initially
-    const [timerMode, setTimerMode] = useState('work'); //work/break/longBreak
-    const [secondsLeft, setsecondsLeft] = useState(0); // 0 sec till end
-    const [todoListIsEmpty, setTodoListIsEmpty] = useState(todoList.length === 0 ? true : false);
-
-    const isPausedRef = useRef(isPaused);
-    const timerModeRef = useRef(timerMode);
-    const secondsLeftRef = useRef(secondsLeft);
-
-
-    const setSettingsMode = (mode) => {
-        updateSettingsVisible(mode);
-    };
-
-    function switchMode() {
-        let workSessionsCount = timerActivityData.workSessionsCount;
-        console.log('workSessionsCount', workSessionsCount);
-        const nextMode = timerModeRef.current === 'work'
-            ? workSessionsCount % 4 === 0 ? 'longBreak' : 'break'
-            : 'work';
-        let nextSeconds;
-        switch (nextMode) {
-            case 'work':
-                increaseTimerWorkSessionCount();
-                nextSeconds = settings.workMin * 60;
-                break;
-            case 'break':
-                nextSeconds = settings.breakMin * 60;
-                break;
-            case 'longBreak':
-                nextSeconds = settings.longBreakMin * 60;
-                break;
-            default:
-                nextSeconds = 0;
-        }
-        setTimerMode(nextMode);
-        timerModeRef.current = nextMode;
-        setsecondsLeft(nextSeconds);
-        secondsLeftRef.current = nextSeconds;
+    const [timerInfo, setTimerInfo] = useState({
+        isStarted: false,
+        isPaused: true,
+        timerMode: 'work',
+        secondsLeft: settings.workMin * 60,
+        workSessionsCount: $timer.getState().workSessionsCount,
+        hasTasks: countNotCompletedTasks,
+    });
+    const timerInfoRef = useRef(timerInfo);
+    const setTimerInfoState = (newState) => {
+        setTimerInfo((prevTimerInfo) => {
+            return {
+                ...prevTimerInfo,
+                ...newState,
+            };
+        });
+    }
+    const setTimerInfoRef = (newState) => {
+        timerInfoRef.current = { ...timerInfoRef.current, ...newState };
     }
 
+    const setTimerIsVisible = () => {
+        changeTimerVisibility(false);
+    };
+
+    const setWorkSessions = () => {
+        if (timerInfoRef.current.timerMode === 'work') {
+            increaseTimerWorkSessionCount();
+            setTimerInfoState({ workSessionsCount: timerInfo.workSessionsCount + 1 });
+            setTimerInfoRef({ workSessionsCount: timerInfoRef.current.workSessionsCount + 1 });
+        }
+    }
+
+    function switchMode() {
+        const nextMode = timerInfoRef.current.timerMode === 'work'
+            ? (timerInfoRef.current.workSessionsCount !== 0 && timerInfoRef.current.workSessionsCount % 4 === 0) ? 'longBreak' : 'break'
+            : 'work';
+        const nextSeconds = {
+            work: settings.workMin * 60,
+            break: settings.breakMin * 60,
+            longBreak: settings.longBreakMin * 60,
+        }[nextMode];
+        setTimerInfoState({ timerMode: nextMode, secondsLeft: nextSeconds });
+        setTimerInfoRef({ timerMode: nextMode, secondsLeft: nextSeconds });
+    };
+
     function onPlayButtonClick() {
-        if (todoListIsEmpty) return;
-        setIsPaused(false);
-        isPausedRef.current = false;
+        if (!timerInfo.hasTasks) return;
+        setTimerInfoState({ isPaused: false, isStarted: true });
+        setTimerInfoRef({ isPaused: false, isStarted: true });
         startTimer(true);
     }
 
     function onPauseButtonClick() {
-        setIsPaused(true);
-        isPausedRef.current = true;
-        startTimer(false);
+        setTimerInfoState({ isPaused: true });
+        setTimerInfoRef({ isPaused: true });
+    }
+
+    function onNextBtnClick() {
+        setTimerInfoState({ isPaused: false, isStarted: true, secondsLeft: 0 });
+        setTimerInfoRef({ isPaused: false, isStarted: true, secondsLeft: 0 });
+    }
+
+    function onStopBtnClick() {
+        if (timerInfoRef.current.isStarted) {
+            setTimerInfoState({ isStarted: false, isPaused: true });
+            setTimerInfoRef({ isStarted: false, isPaused: true });
+            initTimer();
+        }
     }
 
     function tick() {
-        secondsLeftRef.current = secondsLeftRef.current - 1;
-        setsecondsLeft(secondsLeftRef.current);
+        const newSecondsLeft = timerInfoRef.current.secondsLeft - 1;
+        setTimerInfoState({ secondsLeft: newSecondsLeft });
+        setTimerInfoRef({ secondsLeft: newSecondsLeft });
     }
 
     function initTimer() {
-        setsecondsLeft(settings.workMin * 60);
-        secondsLeftRef.current = settings.workMin * 60;
+        const mode = timerInfoRef.current.timerMode;
+        const modeToMin = {
+            work: settings.workMin,
+            break: settings.breakMin,
+            longBreak: settings.longBreakMin,
+        };
+        const totalSecondsLeft = modeToMin[mode] * 60;
+        setTimerInfoState({ secondsLeft: totalSecondsLeft });
+        setTimerInfoRef({ secondsLeft: totalSecondsLeft });
     }
 
     useEffect(() => {
-        const countNotComplpetedTasks = todoList.filter((todo) => todo.isCompleted === false).length;
-         setTodoListIsEmpty(countNotComplpetedTasks > 0 ? false : true);
-    }, [todoList]);
+        initTimer();
+    }, [settings]);
+
+    //update 'hasTasks':
+    useEffect(() => {
+        setTimerInfoState({ hasTasks: countNotCompletedTasks });
+        setTimerInfoRef({ hasTasks: countNotCompletedTasks });
+    }, [countNotCompletedTasks]);
 
     useEffect(() => {
-        initTimer();
-        if (todoListIsEmpty) return;
-        const interval = setInterval(() => {
-            if (!todoListIsEmpty) {
-                if (isPausedRef.current) {
-                    console.log('isPausedRef.current:', isPausedRef.current);
-                    return;
-                }
-                if (secondsLeftRef.current === 0) {
-                    console.log('secondsLeftRef.current:', secondsLeftRef.current);
-                    return switchMode();
-                }
-                tick();
+        let interval;
+
+        if (timerInfoRef.current.isStarted) {
+            if (!timerInfoRef.current.hasTasks) {
+                clearInterval(interval);
+                setTimerInfoState({ isPaused: true, isStarted: false });
+                setTimerInfoRef({ isPaused: true, isStarted: false });
+                startTimer(false);
+                initTimer();
+                return
+            } else {
+                interval = setInterval(() => {
+                    if (timerInfoRef.current.isPaused) {
+                        increaseTimerPauseTime();
+                        return;
+                    }
+                    if (timerInfoRef.current.secondsLeft === 0) {
+                        setWorkSessions();
+                        return switchMode();
+                    }
+                    tick();
+                    if (timerInfoRef.current.timerMode === 'work') {
+                        increaseTimerWorkTime();
+                    }
+                }, 10);
+                return () => clearInterval(interval);
             }
-        }, 10);
-        return () => clearInterval(interval);
-    }, [settings, todoListIsEmpty]);
+        }
+    }, [timerInfoRef.current.hasTasks, timerInfoRef.current.isStarted]);
 
     // time data for Timer visual:
     const timeRemaining = {
         percentage: Math.round(
-            (secondsLeft /
-                ((timerMode === 'work'
+            (timerInfo.secondsLeft /
+                ((timerInfo.timerMode === 'work'
                     ? settings.workMin
-                    : timerMode === 'break'
+                    : timerInfo.timerMode === 'break'
                         ? settings.breakMin
                         : settings.longBreakMin) *
                     60) *
                 100)
         ),
-        minutes: Math.floor(secondsLeft / 60),
-        seconds: (secondsLeft % 60 < 10 ? '0' : '') + (secondsLeft % 60),
+        minutes: Math.floor(timerInfo.secondsLeft / 60),
+        seconds: (timerInfo.secondsLeft % 60 < 10 ? '0' : '') + (timerInfo.secondsLeft % 60),
     };
 
     return (
         <>
-            {!settingsModeOn &&
-                <div className={styles.timerSection}>
-                    <div className={styles.timerBar}>
-                        <CircularProgressbar
-                            value={timeRemaining.percentage}
-                            text={timeRemaining.minutes + ':' + timeRemaining.seconds}
-                            styles={buildStyles({
-                                pathColor: timerMode === 'work' ? tomatoColor : greenColor,
-                                textColor: '#fff',
-                                trailColor: 'rgba(255, 255,255, .2)',
-                            })} />
-                    </div>
-                    <div className={styles.buttonsBar}>
-                        <Button iconcomponent={'settings'} onClick={() => { setSettingsMode(true) }} text={''} iconsize={50} />
-                        <Button iconcomponent={'next'} onClick={() => { }} text={''} iconsize={50} />
-                        {isPaused
-                            ? <Button iconcomponent={'play'} onClick={onPlayButtonClick} text={''} iconsize={50} />
-                            : <Button iconcomponent={'pause'} onClick={onPauseButtonClick} text={''} iconsize={50} />
-                        }
-                        <Button iconcomponent={'stop'} onClick={() => { }} text={''} iconsize={50} />
-                    </div>
+            <p className={styles.notice}> {!timerInfo.hasTasks ? `ADD TASK TO START!` : ``}</p>
+            <div className={styles.timerSection}>
+                <div className={styles.timerBar}>
+                    <CircularProgressbar
+                        value={timeRemaining.percentage}
+                        text={timeRemaining.minutes + ':' + timeRemaining.seconds}
+                        styles={buildStyles({
+                            pathColor: timerInfo.timerMode === 'work' ? tomatoColor : greenColor,
+                            textColor: '#fff',
+                            trailColor: 'rgba(255, 255,255, .2)',
+                        })} />
                 </div>
-            }
+                <div className={styles.buttonsBar}>
+                    <Button iconcomponent={'settings'} onClick={setTimerIsVisible} text={''} iconsize={50} />
+                    <Button iconcomponent={'next'} onClick={onNextBtnClick} text={''} iconsize={50} />
+                    {timerInfo.isPaused
+                        ? <Button iconcomponent={'play'} onClick={onPlayButtonClick} text={''} iconsize={50} />
+                        : <Button iconcomponent={'pause'} onClick={onPauseButtonClick} text={''} iconsize={50} />
+                    }
+                    <Button iconcomponent={'stop'} onClick={onStopBtnClick} text={''} iconsize={50} />
+                </div>
+            </div>
+
         </>
     )
 }

@@ -1,16 +1,16 @@
 .slider {
   height: 30px;
   border: 2px solid var(--tomato);
-  border-radius: 30px;
+  border-radius: 26px;
   margin-bottom: 10px;
 }
 
 .thumb {
   background-color: var(--tomato);
   cursor: pointer;
-  width: 30px;
-  height: 30px;
-  border-radius: 20px;
+  width: 26px;
+  height: 26px;
+  border-radius: 30px;
 }
 
 .slider.green {

@@ -1,3 +1,10 @@
+.notice {
+    margin: 0;
+    color: var(--tomato);
+    opacity: 0.5;
+    height: 19px;
+}
+
 .timerSection {
     display: flex;
     flex-direction: row;

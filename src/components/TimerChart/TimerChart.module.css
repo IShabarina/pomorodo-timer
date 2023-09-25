@@ -1,0 +1,16 @@
+.title {
+    margin: 0 0 10px;
+    color: var(--title-grey);
+    font-size: 16px;
+    font-weight: 100;
+}
+
+.chartsSection {
+    margin: 10px auto;
+    padding: 10px 15px;
+    border: solid 1px var(--back-light-greyback-light-grey);
+    border-radius: 10px;
+    text-align: center;
+    background-color: var(--back-light-grey);
+    color: var(--border-grey);
+}

@@ -10,11 +10,11 @@ const DoneBlock = () => {
 
     return (
         <div className={styles.doneSection}>
-            <h4>Completed tasks</h4>
+            <h4 className={styles.title}>COMPLETED TASKS</h4>
             <div className={styles.doneListContainer}>
                 <div className={styles.doneList}>
                     {doneList.map(doneItem => (
-                        <TodoItem key={doneItem.id} todo={doneItem} />
+                        <TodoItem key={doneItem.id} todo={doneItem} onDelete={() => { }} onEdit={() => { }} onFinish={() => { }} />
                     ))}
                 </div>
             </div>

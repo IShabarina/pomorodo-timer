@@ -3,19 +3,14 @@ import stylesSlider from './ReactSlider.module.css';
 import ReactSlider from 'react-slider';
 import { useStore } from 'effector-react';
 import { Button } from '../Button/Button';
-
-import { $settings, $settingsVisible } from '../../store';
-import { updateSettings, updateSettingsVisible } from '../../event';
-
-// update states:
-$settingsVisible
-    .on(updateSettingsVisible, (_, newSettingsMode) => newSettingsMode); //action & reducer
-$settings
-    .on(updateSettings, (_, newSettings) => newSettings); //action & reducer
-
+import { $settings, changeTimerVisibility, updateSettings } from '../../store';
 
 const Settings = () => {
     const settings = useStore($settings);
+
+    const setTimerIsVisible = () => {
+        changeTimerVisibility(true);
+    };
 
     const updateWorkMin = (newWorkMin) => {
         updateSettings({ ...settings, workMin: newWorkMin });
@@ -31,9 +26,10 @@ const Settings = () => {
 
     return (
         <div className={styles.settingsSection}>
+            <p className={styles.notice}></p>
             <div className={styles.settingBar}>
-                <h2 className={styles.title}>Setting your time</h2>
-                <label className={styles.settingsLabel}>Work {settings.workMin}:00 min </label>
+                <h2 className={styles.title}>SETTING YOUR INTERVALS</h2>
+                <label className={styles.settingsLabel}>WORK {settings.workMin}:00 min </label>
                 <ReactSlider
                     className={stylesSlider.slider}
                     thumbClassName={stylesSlider.thumb}
@@ -43,7 +39,7 @@ const Settings = () => {
                     min={1}
                     max={25}
                 />
-                <label className={styles.settingsLabel}>Shot break {settings.breakMin}:00 min</label>
+                <label className={styles.settingsLabel}>SHOT BREAK {settings.breakMin}:00 min</label>
                 <ReactSlider
                     className={`${stylesSlider.slider} ${stylesSlider.green}`}
                     thumbClassName={stylesSlider.thumb}
@@ -53,7 +49,7 @@ const Settings = () => {
                     min={1}
                     max={10}
                 />
-                <label className={styles.settingsLabel}>Long break {settings.longBreakMin}:00 min</label>
+                <label className={styles.settingsLabel}>LONG BREAK {settings.longBreakMin}:00 min</label>
                 <ReactSlider
                     className={`${stylesSlider.slider} ${stylesSlider.yellow}`}
                     thumbClassName={stylesSlider.thumb}
@@ -65,7 +61,7 @@ const Settings = () => {
                 />
             </div>
             <div>
-                <Button iconcomponent={'back'} onClick={() => { updateSettingsVisible(false) }} text={''} iconsize={25} />
+                <Button iconcomponent={'back'} onClick={setTimerIsVisible} text={''} iconsize={25} />
             </div>
         </div>
     )

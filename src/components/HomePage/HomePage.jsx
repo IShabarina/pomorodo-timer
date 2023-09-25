@@ -2,15 +2,19 @@ import Settings from "../Settings/Settings";
 import Timer from "../Timer/Timer";
 import TodoBlock from "../TodoBlock/TodoBlock";
 import About from "../About/About";
-import { useStore } from "effector-react";
-import { $settingsVisible } from "../../store";
+import { useStoreMap } from "effector-react";
+import { $timer } from "../../store";
 
 const HomePage = () => {
-    const settingsVisible = useStore($settingsVisible);
+       const timerIsVisible = useStoreMap({
+        store: $timer,
+        keys: [],
+        fn: (state) => state.isVisible,
+    });
 
     return (
         <>
-            {settingsVisible ? <Settings /> : <Timer />}
+            {timerIsVisible ? <Timer /> : <Settings /> }
             <TodoBlock />
             <About />
         </>

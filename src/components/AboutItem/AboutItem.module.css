@@ -15,7 +15,13 @@
     border-radius: 10px;
     font-size: 16px;
     text-align: left;
+    color: var(--back-grey);
     cursor: pointer;
+}
+
+.accordionHeader:hover {
+    color: aliceblue;
+    transition: ease-in-out;
 }
 
 .accordionBody {
