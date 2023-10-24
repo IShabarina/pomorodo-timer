@@ -17,37 +17,95 @@ export const options = {
     responsive: true,
     plugins: {
         legend: {
-            position: 'bottom',
-        },
-        title: {
-            display: true,
-            text: 'Timer run time, min',
+            labels: {
+                backgroundColor: '#ECECEC',
+            }
         },
     },
+    scales: {
+        y:
+        {
+            beginAtZero: true,
+            position: 'right',
+            title: {
+                font: {
+                    color: '#333',
+                    size: 12,
+                    style: "normal",
+                    weight: 400,
+                    lineHeight: 33,
+                },
+            },
+            ticks: {
+                stepSize: 1500,
+                callback: function (value) {
+                    // Функция для форматирования значения оси y (время)
+                    const hours = Math.floor(value / 3600); // 1 час = 3600 секунд
+                    const minutes = Math.round((value % 3600) / 60);
+                    return (hours === 0) ? `${minutes}м` : `${hours}ч ${minutes}м`;
+                }
+            },
+            grid: {
+                display: true,
+                drawBorder: false,
+                color: '#333',
+                opacity: 0.2,
+            }
+        }
+        ,
+        x:
+        {
+            grid: {
+                display: false,
+            }
+        }
+
+    },
+    backgroundColor: "#F4F4F4"
 };
 
 const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-export const data = {
-    labels,
-    datasets: [
-        {
-            label: 'Work',
-            data: [1000, 500, 10000],
-            backgroundColor: 'rgba(255, 99, 132, 0.5)',
-        },
-        {
-            label: 'Break',
-            data: [500, 300, 100],
-            backgroundColor: 'rgba(53, 162, 235, 0.5)',
-        },
-    ],
-};
 
-const TimerChart = () => {
+const TimerChart = (dataWork) => {
+    // Воскресенье - 0, Понедельник - 1, Вторник - 2, и так далее
+    const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+    function getDayOfWeek(date) {
+        return daysOfWeek[new Date(date).getDay()];
+    }
+
+    // Подсчитываем сумму workSec для каждого дня недели
+    function getDataWorkSec() {
+        const totalWorkSecByDayOfWeek = [0, 0, 0, 0, 0, 0, 0];
+        console.log(dataWork.data);
+        dataWork.data.forEach(item => {
+            const dayOfWeek = getDayOfWeek(item.date);
+            console.log(dayOfWeek)
+            const dayIndex = daysOfWeek.indexOf(dayOfWeek);
+            console.log(dayIndex);
+            totalWorkSecByDayOfWeek[dayIndex] = item.workSec;
+        });
+        console.log(totalWorkSecByDayOfWeek);
+        return totalWorkSecByDayOfWeek;
+    }
+
+    console.log(getDataWorkSec());
+
+    //
+    const data = {
+        labels,
+        datasets: [
+            {
+                label: false,
+                data: getDataWorkSec(),
+                backgroundColor: '#EA8A79',
+            }
+        ],
+    };
+
     return (
         <div className={styles.chartsSection}>
-            <h2 className={styles.title}>TIMER ACTIVITY</h2>
             <Bar data={data} options={options} />
         </div>
     );

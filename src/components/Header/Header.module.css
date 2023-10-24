@@ -3,7 +3,7 @@
     flex-direction: row;
     justify-content: space-between;
     color: var(--title-grey);
-    padding-right: 15px;
+    padding: 10px 30px 10px 15px;
 }
 
 .header a {
@@ -21,3 +21,8 @@
     transition: ease-in-out;
 }
 
+@media (min-width: 600px) {
+    .header {
+        padding: 10px 80px 10px 80px;
+    }
+}

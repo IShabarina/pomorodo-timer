@@ -4,14 +4,14 @@ import { useStore, useStoreMap } from 'effector-react';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import { Button } from '../Button/Button';
-import { $settings, $todoList, $timer, changeTimerVisibility, startTimer, increaseTimerWorkSessionCount, increaseTimerPauseTime, increaseTimerWorkTime } from '../../store';
+import { $settings, $todoList, $timer, changeTimerVisibility, startTimer, increaseTimerWorkSessionCount, updateTimerWorkSec, updateTimerPauseSec, updateTimerStopsCount } from '../../store';
 
 const tomatoColor = '#f54e54';
 const greenColor = '#318954';
 
 
 const Timer = () => {
-    
+
     const settings = useStore($settings);
     const countNotCompletedTasks = useStoreMap({
         store: $todoList,
@@ -25,6 +25,8 @@ const Timer = () => {
         timerMode: 'work',
         secondsLeft: settings.workMin * 60,
         workSessionsCount: $timer.getState().workSessionsCount,
+        workSecCount: 0,
+        pauseSecCount: 0,
         hasTasks: countNotCompletedTasks,
     });
     const timerInfoRef = useRef(timerInfo);
@@ -86,6 +88,7 @@ const Timer = () => {
         if (timerInfoRef.current.isStarted) {
             setTimerInfoState({ isStarted: false, isPaused: true });
             setTimerInfoRef({ isStarted: false, isPaused: true });
+            updateTimerStopsCount();
             initTimer();
         }
     }
@@ -96,7 +99,22 @@ const Timer = () => {
         setTimerInfoRef({ secondsLeft: newSecondsLeft });
     }
 
+    // function timerWorkSecCount() {
+    //     const newWorkSecCount = timerInfoRef.current.workSecCount + 1;
+    //     setTimerInfoState({ workSecCount: newWorkSecCount });
+    //     setTimerInfoRef({ workSecCount: newWorkSecCount });
+    // }
+
+    // function timerPauseSecCount() {
+    //     const newPauseSecCount = timerInfoRef.current.pauseSecCount + 1;
+    //     setTimerInfoState({ pauseSecCount: newPauseSecCount });
+    //     setTimerInfoRef({ pauseSecCount: newPauseSecCount });
+    // }
+
     function initTimer() {
+        // console.log(timerInfoRef.current);
+        // updateTimerPauseSec(timerInfoRef.current.pauseSecCount);
+        // updateTimerWorkSec(timerInfoRef.current.workSecCount);
         const mode = timerInfoRef.current.timerMode;
         const modeToMin = {
             work: settings.workMin,
@@ -132,7 +150,8 @@ const Timer = () => {
             } else {
                 interval = setInterval(() => {
                     if (timerInfoRef.current.isPaused) {
-                        increaseTimerPauseTime();
+                        // timerPauseSecCount();
+                        updateTimerPauseSec(1);
                         return;
                     }
                     if (timerInfoRef.current.secondsLeft === 0) {
@@ -141,7 +160,8 @@ const Timer = () => {
                     }
                     tick();
                     if (timerInfoRef.current.timerMode === 'work') {
-                        increaseTimerWorkTime();
+                        // timerWorkSecCount(); // for this task count sec
+                        updateTimerWorkSec(1);
                     }
                 }, 10);
                 return () => clearInterval(interval);

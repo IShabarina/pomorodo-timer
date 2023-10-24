@@ -1,5 +1,6 @@
 import { createStore, createEvent } from 'effector';
 import { generateRandomString } from './utils/generateRandomIndex';
+import { getCurrentDateWithoutTime } from './utils/getDateWithoutTime';
 
 // for timer's settings:
 export const updateSettings = createEvent();
@@ -14,25 +15,83 @@ export const $settings = createStore({
 export const changeTimerVisibility = createEvent();
 export const startTimer = createEvent();
 export const increaseTimerWorkSessionCount = createEvent();
-export const increaseTimerWorkTime = createEvent();
-export const increaseTimerPauseTime = createEvent();
+export const updateTimerWorkSec = createEvent();
+export const updateTimerPauseSec = createEvent();
+export const updateTimerStopsCount = createEvent();
 export const $timer = createStore({
     isVisible: true,
     isStarted: false,
     workSessionsCount: 0,
+    activity: [],
 })
     .on(changeTimerVisibility, (state, status) => ({
         ...state,
         isVisible: status
     }))
-    .on(startTimer, (state, status) => ({
-        ...state,
-        isStarted: status
-    }))
+    .on(startTimer, (state, status) => {
+        let newDate = getCurrentDateWithoutTime();
+        console.log('startTimer - state.activity.length:', state.activity.length);
+        console.log('startTimer - index', state.activity.findIndex((item) => item.date === newDate));
+        if (state.activity.length === 0 || state.activity.findIndex((item) => item.date === newDate) === -1) {
+            console.log('startTimer - создаем объект в activity')
+            return {
+                ...state,
+                isStarted: status,
+                activity: [
+                    ...state.activity,
+                    { date: newDate, workSec: 0, pauseSec: 0, stopCount: 0, },
+                ],
+            };
+        }
+        return {
+            ...state,
+            isStarted: status
+        };
+    })
     .on(increaseTimerWorkSessionCount, (state) => ({
         ...state,
         workSessionsCount: state.workSessionsCount + 1
     }))
+    .on(updateTimerWorkSec, (state, sec) => {
+        let newDate = getCurrentDateWithoutTime();
+        const existSessionIndex = state.activity.findIndex((item) => item.date === newDate);
+        const updatedActivity = [...state.activity];
+        console.log('updateTimerWorkSec - updatedActivity:', updatedActivity);
+        updatedActivity[existSessionIndex] = {
+            ...updatedActivity[existSessionIndex],
+            workSec: updatedActivity[existSessionIndex].workSec + sec,
+        };
+        return {
+            ...state,
+            activity: updatedActivity,
+        }
+    })
+    .on(updateTimerPauseSec, (state, sec) => {
+        let newDate = getCurrentDateWithoutTime();
+        const existSessionIndex = state.activity.findIndex((item) => item.date === newDate);
+        const updatedActivity = [...state.activity];
+        updatedActivity[existSessionIndex] = {
+            ...updatedActivity[existSessionIndex],
+            pauseSec: updatedActivity[existSessionIndex].pauseSec + sec,
+        };
+        return {
+            ...state,
+            activity: updatedActivity,
+        }
+    })
+    .on(updateTimerStopsCount, (state) => {
+        let newDate = getCurrentDateWithoutTime();
+        const existSessionIndex = state.activity.findIndex((item) => item.date === newDate);
+        const updatedActivity = [...state.activity];
+        updatedActivity[existSessionIndex] = {
+            ...updatedActivity[existSessionIndex],
+            stopCount: updatedActivity[existSessionIndex].stopCount + 1,
+        };
+        return {
+            ...state,
+            activity: updatedActivity,
+        }
+    })
 
 // for list of tasks:
 export const addTodo = createEvent();
@@ -52,10 +111,8 @@ export const $todoList = createStore([])
             isCompleted: false,
             time: task.time,
             timeLeft: task.time,
-            // startedAt: new Date(),
-            // workTime: 
-            // pauseTime:
-            // stopped:
+            startedAt: 0,
+            duration: 0,
         },
     ])
     .on(startFirstTodo, (todoList) => {
@@ -66,6 +123,7 @@ export const $todoList = createStore([])
                 return {
                     ...todo,
                     isStarted: true,
+                    startedAt: getCurrentDateWithoutTime(),
                 };
             } else {
                 return {
@@ -132,21 +190,6 @@ export const $doneList = createStore([])
         ...doneList,
         doneTask
     ]);
-
-// for timer statistic:
-export const $statistic = createStore({
-    date: new Date(),
-    workSec: 0,
-    pauseSec: 0,
-})
-    .on(increaseTimerWorkTime, (state) => ({
-        ...state,
-        workSec: state.workSec + 1
-    }))
-    .on(increaseTimerPauseTime, (state) => ({
-        ...state,
-        pauseSec: state.pauseSec + 1
-    }));;
 
 
 //watchers:

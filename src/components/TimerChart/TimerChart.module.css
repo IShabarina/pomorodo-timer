@@ -1,16 +1,25 @@
-.title {
+/* .title {
     margin: 0 0 10px;
     color: var(--title-grey);
     font-size: 16px;
     font-weight: 100;
-}
+} */
 
 .chartsSection {
-    margin: 10px auto;
+    /* margin: 10px auto;
     padding: 10px 15px;
     border: solid 1px var(--back-light-greyback-light-grey);
-    border-radius: 10px;
+    border-radius: 10px; */
     text-align: center;
-    background-color: var(--back-light-grey);
+    /* background-color: var(--back-light-grey); */
+    background: #F4F4F4;
     color: var(--border-grey);
+}
+
+@media (min-width: 600px) {
+    .chartsSection {
+        width: 75%;
+        max-width: 952px;
+        height: 471px;
+    }
 }

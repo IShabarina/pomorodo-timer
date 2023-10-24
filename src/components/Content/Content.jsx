@@ -2,7 +2,7 @@ import styles from './Content.module.css';
 
 const Content = ({ children }) => {
     return (
-        <main>
+        <main className={styles.main}>
             {children}
         </main>
     )
