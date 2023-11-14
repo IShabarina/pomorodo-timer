@@ -15,6 +15,7 @@ export const $settings = createStore({
 export const changeTimerVisibility = createEvent();
 export const startTimer = createEvent();
 export const increaseTimerWorkSessionCount = createEvent();
+export const updateWorkSessionCount = createEvent();
 export const updateTimerWorkSec = createEvent();
 export const updateTimerPauseSec = createEvent();
 export const updateTimerStopsCount = createEvent();
@@ -39,7 +40,7 @@ export const $timer = createStore({
                 isStarted: status,
                 activity: [
                     ...state.activity,
-                    { date: newDate, workSec: 0, pauseSec: 0, stopCount: 0, },
+                    { date: newDate, workSec: 0, pauseSec: 0, stopCount: 0, workSessionsCount: 0 },
                 ],
             };
         }
@@ -52,6 +53,19 @@ export const $timer = createStore({
         ...state,
         workSessionsCount: state.workSessionsCount + 1
     }))
+    .on(updateWorkSessionCount, (state) => {
+        let newDate = getCurrentDateWithoutTime();
+        const existSessionIndex = state.activity.findIndex((item) => item.date === newDate);
+        const updatedActivity = [...state.activity];
+        updatedActivity[existSessionIndex] = {
+            ...updatedActivity[existSessionIndex],
+            workSessionsCount: updatedActivity[existSessionIndex].workSessionsCount + 1,
+        };
+        return {
+            ...state,
+            activity: updatedActivity,
+        }
+    })
     .on(updateTimerWorkSec, (state, sec) => {
         let newDate = getCurrentDateWithoutTime();
         const existSessionIndex = state.activity.findIndex((item) => item.date === newDate);

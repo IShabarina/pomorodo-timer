@@ -1,8 +1,8 @@
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 import styles from './TimerChart.module.css';
+import { useState } from 'react';
 
-// JUST FOR TEST -> IN PROCESS 
 
 ChartJS.register(
     CategoryScale,
@@ -68,11 +68,11 @@ const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 
 const TimerChart = (dataWork) => {
-    // Воскресенье - 0, Понедельник - 1, Вторник - 2, и так далее
-    const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const [selectedWeek, setSelectedWeek] = useState('current');
+    const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
     function getDayOfWeek(date) {
-        return daysOfWeek[new Date(date).getDay()];
+        return daysOfWeek[new Date(date).getDay() - 1];
     }
 
     // Подсчитываем сумму workSec для каждого дня недели
@@ -92,7 +92,6 @@ const TimerChart = (dataWork) => {
 
     console.log(getDataWorkSec());
 
-    //
     const data = {
         labels,
         datasets: [

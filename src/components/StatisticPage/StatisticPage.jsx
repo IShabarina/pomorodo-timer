@@ -1,45 +1,47 @@
 // import DoneBlock from '../DoneBlock/DoneBlock';
-import { useStoreMap } from 'effector-react';
+import { useStore } from 'effector-react';
 import TimerChart from '../TimerChart/TimerChart';
 import styles from './StatisticPage.module.css';
 import { getDayOfWeek } from '../../utils/getDayOfWeek';
 import { getCurrentDateWithoutTime } from '../../utils/getDateWithoutTime';
-import { formatWorkTime } from '../../utils/getHoursMinFromSec';
+import { formatWorkTime, formatPauseTime } from '../../utils/getHoursMinFromSec';
 import { $timer } from '../../store';
 import Tomato from '../Tomato/Tomato';
+import StatisticCard from '../StatisticCard/StatisticCard';
 
 const StatisticPage = () => {
 
     const todayDate = getCurrentDateWithoutTime();
-
+    const todayDayOfWeek = getDayOfWeek(todayDate)
+    const timer = useStore($timer);
     console.log('todayDate', todayDate);
-    const timerActivity = useStoreMap({
-        store: $timer,
-        keys: ['activity'],
-        fn: (state) => state.activity,
-    })
-    const timerWorkSessionsCount = useStoreMap({
-        store: $timer,
-        keys: ['workSessionsCount'],
-        fn: (state) => state.workSessionsCount,
-    })
+    const timerActivity = timer.activity;
+    const timerWorkSessionsCount = timer.workSessionsCount;
     console.log(timerActivity);
 
-    const workTimeToday = () => {
-        for (const activity of timerActivity) {
-            console.log(activity.date, todayDate);
-
-            if (activity.date === todayDate) {
-                console.log('worked')
-                const workData = formatWorkTime(activity.workSec);
-                console.log(workData);
-                return workData;
-            }
-            else {
-                return null
-            }
+    const getTimerActivityToday = () => {
+        if (timerActivity.length === 0) return null;
+        const todayActivity = timerActivity.find(activity => activity.date === todayDate);
+        if (todayActivity) {
+            console.log(todayActivity.date);
+            const workData = formatWorkTime(todayActivity.workSec);
+            const pauseData = formatPauseTime(todayActivity.pauseSec);
+            const stopsData = todayActivity.stopCount;
+            const focusTime = `${Math.round(((todayActivity.workSec - todayActivity.pauseSec) / todayActivity.workSec) * 100)} %`;
+            return {
+                workData,
+                pauseData,
+                stopsData,
+                focusTime,
+            };
         }
-    }
+        else {
+            return null
+        }
+    };
+    const timerActivityToday = getTimerActivityToday();
+    console.log(timerActivityToday);
+
 
     return (
         <div className={styles.statisticContainer}>
@@ -49,43 +51,45 @@ const StatisticPage = () => {
                     <select className={styles.select}
                         name="time"
                         onChange={() => { }}
-                        value='Эта неделя'
+                        value='currect'
                     >
-                        <option value="Эта неделя">Эта неделя</option>
-                        <option value="Прошедшая неделя">Прошедшая неделя</option>
-                        <option value="2 недели назад">2 недели назад</option>
+                        <option value="current">Эта неделя</option>
+                        <option value="last">Прошедшая неделя</option>
+                        <option value="twoWeeksAgo">2 недели назад</option>
                     </select>
                 </div>
             </div>
 
             <div className={styles.statContent}>
                 <div className={styles.statContentLeft}>
+
                     <div className={styles.day}>
-                        <h4>{getDayOfWeek(todayDate)}</h4>
-                        <p>{workTimeToday() && timerActivity.length > 0 ? `Вы работали над задачами в течение ${(workTimeToday().hours) ? workTimeToday().hours : ''} ${(workTimeToday().hours) ? workTimeToday().hoursText : ''} ${workTimeToday().minutes} ${workTimeToday().minutesText}` : `Нет данных`}</p>
+                        <h4>{todayDayOfWeek}</h4>
+                        {timerActivityToday
+                            ? <>
+                                <span>Вы работали над задачами <br />в течение </span>
+                                <span className={styles.red}>{timerActivityToday.workData} </span>
+                            </>
+                            : <span>Нет данных</span>}
                     </div>
 
                     <div className={styles.tomato}>
-
-                        <Tomato sessions={timerWorkSessionsCount}/>
-
+                        <Tomato sessions={timerWorkSessionsCount} />
                     </div>
+
                 </div>
                 <TimerChart data={timerActivity} />
             </div>
 
             <div className={styles.statFooter}>
                 <div>
-                    <h4>Фокус</h4>
-                    <span>35%</span>
+                    <StatisticCard name={'Фокус'} value={timerActivityToday ? timerActivityToday.focusTime : '0%'} icon={'focus'} />
                 </div>
                 <div>
-                    <h4>Время на паузе</h4>
-                    <span>9M</span>
+                    <StatisticCard name={'Время на паузе'} value={timerActivityToday ? timerActivityToday.pauseData: '0м'} icon={'pause'} />
                 </div>
                 <div>
-                    <h4>Остановки</h4>
-                    <span>3</span>
+                    <StatisticCard name={'Остановки'} value={timerActivityToday ? timerActivityToday.stopsData : '0'} icon={'stop'} />
                 </div>
             </div>
         </div>

@@ -1,4 +1,4 @@
-This React project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+React project for a task tracker with a timer:
 
 In the project directory run:
 

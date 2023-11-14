@@ -1,20 +1,28 @@
 export function formatWorkTime(sec) {
-    console.log(sec);
-    if (sec && sec !== null) {
-        const hours = Math.floor(sec / 3600);
-        const minutes = Math.floor((sec % 3600) / 60);
+    if (sec === 0) return 0;
+    const hours = Math.floor(sec / 3600);
+    const minutes = Math.floor((sec % 3600) / 60);
 
-        const hoursText = hours === 1 ? 'час' : hours < 5 ? 'часа' : 'часов';
-        const minutesText = minutes === 1 ? 'минута' : minutes < 5 ? 'минуты' : 'минут';
+    const hoursText = hours === 1 ? ' часа ' : ' часов ';
+    const minutesText = minutes === 1 ? ' минуты ' : ' минут ';
 
-        return {
-            hours,
-            hoursText,
-            minutes,
-            minutesText
-        }
+    const getWorkTimeToString = () => hours
+        ? `${hours} ${hoursText} ${minutes} ${minutesText}`
+        : `${minutes} ${minutesText}`;
 
-    } else {
-        return null;
-    }
+    return getWorkTimeToString();
+}
+
+
+export function formatPauseTime(sec) {
+    if (sec === 0) return '0 м';
+    const hours = Math.floor(sec / 3600);
+    const minutes = Math.floor((sec % 3600) / 60);
+
+    const getPauseTimeToString = () => hours
+        ? `${hours}  ч  ${minutes}  м`
+        : `${(minutes)} м`
+
+    return getPauseTimeToString();
+
 }

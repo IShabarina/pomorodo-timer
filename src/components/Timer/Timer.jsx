@@ -4,7 +4,7 @@ import { useStore, useStoreMap } from 'effector-react';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import { Button } from '../Button/Button';
-import { $settings, $todoList, $timer, changeTimerVisibility, startTimer, increaseTimerWorkSessionCount, updateTimerWorkSec, updateTimerPauseSec, updateTimerStopsCount } from '../../store';
+import { $settings, $todoList, $timer, changeTimerVisibility, startTimer, increaseTimerWorkSessionCount, updateWorkSessionCount, updateTimerWorkSec, updateTimerPauseSec, updateTimerStopsCount } from '../../store';
 
 const tomatoColor = '#f54e54';
 const greenColor = '#318954';
@@ -49,6 +49,7 @@ const Timer = () => {
     const setWorkSessions = () => {
         if (timerInfoRef.current.timerMode === 'work') {
             increaseTimerWorkSessionCount();
+            updateWorkSessionCount();
             setTimerInfoState({ workSessionsCount: timerInfo.workSessionsCount + 1 });
             setTimerInfoRef({ workSessionsCount: timerInfoRef.current.workSessionsCount + 1 });
         }
@@ -99,22 +100,7 @@ const Timer = () => {
         setTimerInfoRef({ secondsLeft: newSecondsLeft });
     }
 
-    // function timerWorkSecCount() {
-    //     const newWorkSecCount = timerInfoRef.current.workSecCount + 1;
-    //     setTimerInfoState({ workSecCount: newWorkSecCount });
-    //     setTimerInfoRef({ workSecCount: newWorkSecCount });
-    // }
-
-    // function timerPauseSecCount() {
-    //     const newPauseSecCount = timerInfoRef.current.pauseSecCount + 1;
-    //     setTimerInfoState({ pauseSecCount: newPauseSecCount });
-    //     setTimerInfoRef({ pauseSecCount: newPauseSecCount });
-    // }
-
     function initTimer() {
-        // console.log(timerInfoRef.current);
-        // updateTimerPauseSec(timerInfoRef.current.pauseSecCount);
-        // updateTimerWorkSec(timerInfoRef.current.workSecCount);
         const mode = timerInfoRef.current.timerMode;
         const modeToMin = {
             work: settings.workMin,
